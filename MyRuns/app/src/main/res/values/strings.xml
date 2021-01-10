@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">MyRuns_UserProfile</string>
+    <string name = "profileLabel">Profile Photo:</string>
+    <string name ="profileButton">CHANGE</string>
+    <string name = "nameLabel">Name</string>
+    <string name = "nameInput">Your Name</string>
+    <string name = "emailLabel">Email</string>
+    <string name = "emailInput">Your Email</string>
+    <string name = "genderLabel">Gender</string>
+    <string name = "genderFemale">Female</string>
+    <string name = "genderMale">Male</string>
+    <string name = "classLabel">Class</string>
+    <string name = "classInput">eg. 2012</string>
+    <string name = "phoneLabel">Phone</string>
+    <string name ="phoneInput">Your Phone Number</string>
+    <string name = "majorLabel">Major</string>
+    <string name = "majorInput">Your Major</string>
+    <string name = "saveButton">SAVE</string>
+    <string name = "cancelButton">CANCEL</string>
+</resources>
