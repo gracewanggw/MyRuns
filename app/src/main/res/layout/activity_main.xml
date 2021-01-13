@@ -192,7 +192,8 @@
                 android:layout_weight="1"
                 android:layout_marginRight="10dp"
                 android:layout_marginLeft="50dp"
-                android:text="SAVE" />
+                android:text="SAVE"
+                android:onClick="onSaveButton"/>
 
             <Button
                 android:id="@+id/cancelButton"
@@ -203,7 +204,8 @@
                 android:layout_weight="1"
                 android:layout_marginRight="50dp"
                 android:layout_marginLeft="10dp"
-                android:text="CANCEL" />
+                android:text="CANCEL"
+                android:onClick="onCancelButton"/>
         </LinearLayout>
 
 
