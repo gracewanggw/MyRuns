@@ -19,7 +19,7 @@
         app:layout_constraintVertical_bias="0.022" />
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/imageProfile"
         android:layout_width="121dp"
         android:layout_height="101dp"
         android:layout_marginStart="120dp"
@@ -36,7 +36,6 @@
         android:layout_marginTop="72dp"
         android:backgroundTint="@android:color/white"
         android:hint="@string/profileButton"
-        android:onClick="changeProfile"
         android:text=""
         android:textColor="@android:color/black"
         app:layout_constraintStart_toStartOf="parent"

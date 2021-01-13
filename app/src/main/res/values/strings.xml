@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">MyRuns1</string>
+    <string name = "profileText">Profile Photo:</string>
+    <string name = "profileButton">CHANGE</string>
+    <string name = "nameText">Name </string>
+</resources>
