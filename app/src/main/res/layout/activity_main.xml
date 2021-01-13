@@ -35,8 +35,8 @@
 
             <Button
                 android:id="@+id/profileButton"
-                android:backgroundTint="@android:color/white"
-                android:textColor="@android:color/black"
+                android:backgroundTint="@color/buttonColor"
+                android:textColor="@color/black"
                 android:layout_width="100dp"
                 android:layout_height="50dp"
                 android:layout_marginTop="30dp"
@@ -185,8 +185,8 @@
 
             <Button
                 android:id="@+id/saveButton"
-                android:backgroundTint="@android:color/white"
-                android:textColor="@android:color/black"
+                android:backgroundTint="@color/buttonColor"
+                android:textColor="@color/black"
                 android:layout_width="100dp"
                 android:layout_height="50dp"
                 android:layout_weight="1"
@@ -196,8 +196,8 @@
 
             <Button
                 android:id="@+id/cancelButton"
-                android:backgroundTint="@android:color/white"
-                android:textColor="@android:color/black"
+                android:backgroundTint="@color/buttonColor"
+                android:textColor="@color/black"
                 android:layout_width="100dp"
                 android:layout_height="50dp"
                 android:layout_weight="1"

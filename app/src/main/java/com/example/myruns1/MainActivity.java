@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -14,6 +15,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
 
@@ -39,14 +42,37 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    protected void onChangeButton(View view){
-        //imageView = (ImageView)findViewById(R.id.imageProfile);
-//        File tempImgFile = new File(getExternalFilesDir(null), tempImgFileName);
-//        tempImgUri = FileProvider.getUriForFile(this, "com.example.myruns1", tempImgFile);
-//        imageView.setImageURI(tempImgUri);
+    public void onChangeButton(View view){
+        imageView = (ImageView)findViewById(R.id.imageProfile);
+        File tempImgFile = new File(getExternalFilesDir(null), tempImgFileName);
+        tempImgUri = FileProvider.getUriForFile(this, "com.example.myruns1", tempImgFile);
+        imageView.setImageURI(tempImgUri);
+        Log.d("gwang","here1");
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        //intent.putExtra(MediaStore.EXTRA_OUTPUT, tempImgUri);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, tempImgUri);
         startActivityForResult(intent, CAMERA_REQUEST_CODE);
+        Log.d("gwang", "here2");
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        //#5
+        super.onActivityResult(requestCode,resultCode,data);
+        if(resultCode != Activity.RESULT_OK) return;
+
+        //#4
+        if(requestCode == CAMERA_REQUEST_CODE){
+            //#6
+            Crop.of(tempImgUri, tempImgUri).asSquare().start(this);
+            //~~~~ run the code ~~~~
+        }else if(requestCode == Crop.REQUEST_CROP){//#7
+            Uri selectedImgUri = Crop.getOutput(data);
+            imageView.setImageURI(null);
+            imageView.setImageURI(selectedImgUri);
+            //***
+            //line = tempImgUri.getPath();
+            //textView.setText(line);
+            //***
+        }
     }
 
 }
