@@ -67,10 +67,10 @@ public class MainActivity extends AppCompatActivity {
         checkPermissions();
 
         nameText = (EditText)findViewById(R.id.nameEdit);
-//        emailText = (EditText)findViewById(R.id.emailEdit);
-//        phoneText = (EditText)findViewById(R.id.phoneEdit);
-//        classNum = (EditText)findViewById(R.id.classEdit);
-//        majorText = (EditText)findViewById(R.id.majorEdit);
+        emailText = (EditText)findViewById(R.id.emailEdit);
+        phoneText = (EditText)findViewById(R.id.phoneEdit);
+        classNum = (EditText)findViewById(R.id.classEdit);
+        majorText = (EditText)findViewById(R.id.majorEdit);
 
         loadData();
         Log.d("gwang","onCreate " + saved);
@@ -169,10 +169,10 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editors = sharedPreferences.edit();
         editors.putBoolean(SAVED_KEY,save);
         editors.putString(NAME_KEY,nameText.getText().toString());
-//        editors.putString(EMAIL_KEY,emailText.getText().toString());
-//        editors.putString(PHONE_KEY,phoneText.getText().toString());
-//        editors.putInt(CLASS_KEY, Integer.parseInt(classNum.getText().toString()));
-//        editors.putString(MAJOR_KEY,majorText.getText().toString());
+        editors.putString(EMAIL_KEY,emailText.getText().toString());
+        editors.putString(PHONE_KEY,phoneText.getText().toString());
+        editors.putInt(CLASS_KEY, Integer.parseInt(classNum.getText().toString()));
+        editors.putString(MAJOR_KEY,majorText.getText().toString());
         //editors.putBoolean("TOOK_PICTURE",took_picture);
         //Log.d("gwang", "name " + nameText.getText().toString());
         //editors.putString(NAME_KEY, nameText.getText().toString());
@@ -188,19 +188,19 @@ public class MainActivity extends AppCompatActivity {
         saved = sharedPreferences.getBoolean(SAVED_KEY,false);
         //took_picture = sharedPreferences.getBoolean("TOOK_PICTURE",false);
         name = sharedPreferences.getString(NAME_KEY,"");
-//        email = sharedPreferences.getString(EMAIL_KEY,"");
-//        phone = sharedPreferences.getString(PHONE_KEY,"");
-//        classYear = sharedPreferences.getInt(CLASS_KEY,0);
-//        major = sharedPreferences.getString(MAJOR_KEY,"");
+        email = sharedPreferences.getString(EMAIL_KEY,"");
+        phone = sharedPreferences.getString(PHONE_KEY,"");
+        classYear = sharedPreferences.getInt(CLASS_KEY,0);
+        major = sharedPreferences.getString(MAJOR_KEY,"");
         Log.d("gwang", "loadData " + sharedPreferences.getBoolean(SAVED_KEY,false));
     }
 
     public void updateViews(){
         nameText.setText(name);
-//        emailText.setText(email);
-//        phoneText.setText(phone);
-//        classNum.setText(classYear);
-//        majorText.setText(major);
+        emailText.setText(email);
+        phoneText.setText(phone);
+        classNum.setText(classYear+"");
+        majorText.setText(major);
     }
 
 }
