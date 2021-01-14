@@ -14,26 +14,51 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
-    
+    private EditText nameText;
+    private EditText  emailText;
+    private EditText  phoneText;
+    private int gender;
+    private EditText classNum;
+    private EditText  majorText;
+
+    private String name;
+    private String email;
+    private String phone;
+    //private int gender;
+    private int classYear;
+    private String major;
+
+    public final static String SHARED_PREFS = "sharedPrefs";
+    public static final String SAVED_KEY = "saved_key";
+    public static final String NAME_KEY = "name_key";
+    public static final String EMAIL_KEY = "email_key";
+    public static final String PHONE_KEY = "phone_key";
+    public static final String CLASS_KEY = "class_key";
+    public static final String MAJOR_KEY = "major_key";
+
     public static final int CAMERA_REQUEST_CODE =  1;
     private boolean saved;
     private Uri tempImgUri;
     private Uri saveImgUri;
     private ImageView imageView;
     private String tempImgFileName = "profile.jpg";
-    public static final String SAVED_KEY = "saved_key";
+
     //public static final boolean SAVED_BOOLEAN = true;
     public Uri location;
+    //public boolean took_picture = false;
 
-    public final static String SHARED_PREFS = "sharedPrefs";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,14 +66,22 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         checkPermissions();
 
+        nameText = (EditText)findViewById(R.id.nameEdit);
+//        emailText = (EditText)findViewById(R.id.emailEdit);
+//        phoneText = (EditText)findViewById(R.id.phoneEdit);
+//        classNum = (EditText)findViewById(R.id.classEdit);
+//        majorText = (EditText)findViewById(R.id.majorEdit);
+
         loadData();
         Log.d("gwang","onCreate " + saved);
         if(saved){
             //if(savedInstanceState.getString(SAVED_KEY).equals("true")){
-                imageView = (ImageView)findViewById(R.id.imageProfile);
-                File tempImgFile = new File(getExternalFilesDir(null), tempImgFileName);//XD: try Environment.DIRECTORY_PICTURES instead of "null"
-                tempImgUri = FileProvider.getUriForFile(this, "com.example.myruns1", tempImgFile);
-                imageView.setImageURI(tempImgUri);
+            imageView = (ImageView)findViewById(R.id.imageProfile);
+            File tempImgFile = new File(getExternalFilesDir(null), tempImgFileName);//XD: try Environment.DIRECTORY_PICTURES instead of "null"
+            tempImgUri = FileProvider.getUriForFile(this, "com.example.myruns1", tempImgFile);
+            imageView.setImageURI(tempImgUri);
+
+            updateViews();
             //}
         }
 
@@ -113,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
             //textView.setText(line);
             //***
             location = selectedImgUri;
+            //took_picture = true;
         }
     }
 
@@ -126,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void onCancelButton(View view){
         Log.d("gwang", "here2");
-        saveData(false);
+        location = null;
         finish();
     }
 
@@ -134,15 +168,39 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
         SharedPreferences.Editor editors = sharedPreferences.edit();
         editors.putBoolean(SAVED_KEY,save);
-        saved = sharedPreferences.getBoolean(SAVED_KEY,false);
+        editors.putString(NAME_KEY,nameText.getText().toString());
+//        editors.putString(EMAIL_KEY,emailText.getText().toString());
+//        editors.putString(PHONE_KEY,phoneText.getText().toString());
+//        editors.putInt(CLASS_KEY, Integer.parseInt(classNum.getText().toString()));
+//        editors.putString(MAJOR_KEY,majorText.getText().toString());
+        //editors.putBoolean("TOOK_PICTURE",took_picture);
+        //Log.d("gwang", "name " + nameText.getText().toString());
+        //editors.putString(NAME_KEY, nameText.getText().toString());
+        //saved = sharedPreferences.getBoolean(SAVED_KEY,false);
         editors.apply();
+
+        Toast.makeText(this,"Data saved", Toast.LENGTH_SHORT);
         Log.d("gwang","saved data " + saved);
     }
 
     public void loadData(){
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
         saved = sharedPreferences.getBoolean(SAVED_KEY,false);
+        //took_picture = sharedPreferences.getBoolean("TOOK_PICTURE",false);
+        name = sharedPreferences.getString(NAME_KEY,"");
+//        email = sharedPreferences.getString(EMAIL_KEY,"");
+//        phone = sharedPreferences.getString(PHONE_KEY,"");
+//        classYear = sharedPreferences.getInt(CLASS_KEY,0);
+//        major = sharedPreferences.getString(MAJOR_KEY,"");
         Log.d("gwang", "loadData " + sharedPreferences.getBoolean(SAVED_KEY,false));
+    }
+
+    public void updateViews(){
+        nameText.setText(name);
+//        emailText.setText(email);
+//        phoneText.setText(phone);
+//        classNum.setText(classYear);
+//        majorText.setText(major);
     }
 
 }
