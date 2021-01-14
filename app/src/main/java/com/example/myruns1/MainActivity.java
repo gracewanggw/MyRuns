@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,14 +28,15 @@ public class MainActivity extends AppCompatActivity {
     private EditText nameText;
     private EditText  emailText;
     private EditText  phoneText;
-    private int gender;
+    private RadioButton genderFemale;
+    private RadioButton genderMale;
     private EditText classNum;
     private EditText  majorText;
 
     private String name;
     private String email;
     private String phone;
-    //private int gender;
+    private int gender;
     private int classYear;
     private String major;
 
@@ -45,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String PHONE_KEY = "phone_key";
     public static final String CLASS_KEY = "class_key";
     public static final String MAJOR_KEY = "major_key";
+    public static final String GENDER_KEY = "gender_key";
 
     public static final int CAMERA_REQUEST_CODE =  1;
     private boolean saved;
@@ -53,11 +56,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imageView;
     private String tempImgFileName = "profile.jpg";
 
-    //public static final boolean SAVED_BOOLEAN = true;
+
     public Uri location;
-    //public boolean took_picture = false;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,35 +71,25 @@ public class MainActivity extends AppCompatActivity {
         phoneText = (EditText)findViewById(R.id.phoneEdit);
         classNum = (EditText)findViewById(R.id.classEdit);
         majorText = (EditText)findViewById(R.id.majorEdit);
-
+        genderFemale = (RadioButton)findViewById(R.id.femaleButton);
+        genderMale = (RadioButton)findViewById(R.id.maleButton);
+        imageView = (ImageView)findViewById(R.id.imageProfile);
         loadData();
+
         Log.d("gwang","onCreate " + saved);
+
         if(saved){
-            //if(savedInstanceState.getString(SAVED_KEY).equals("true")){
-            imageView = (ImageView)findViewById(R.id.imageProfile);
             File tempImgFile = new File(getExternalFilesDir(null), tempImgFileName);//XD: try Environment.DIRECTORY_PICTURES instead of "null"
             tempImgUri = FileProvider.getUriForFile(this, "com.example.myruns1", tempImgFile);
             imageView.setImageURI(tempImgUri);
 
             updateViews();
-            //}
+
         }
 
 
     }
-//    @Override
-//    protected void onSaveInstanceState(Bundle outState){
-//        super.onSaveInstanceState(outState);
-//        String value;
-//        if(saved==true){
-//            value = "true";
-//        }
-//        else{
-//            value = "false";
-//        }
-//        outState.putString(SAVED_KEY,value);
-//        Log.d("gwang", "savedInstanceState "+ outState.getString(SAVED_KEY));
-//    }
+
     private void checkPermissions()
     {
         if(Build.VERSION.SDK_INT < 23)
@@ -113,41 +103,41 @@ public class MainActivity extends AppCompatActivity {
     public void onChangeButton(View view){
         File tempImgFile = new File(getExternalFilesDir(null), tempImgFileName);
         tempImgUri = FileProvider.getUriForFile(this, "com.example.myruns1", tempImgFile);
-        //imageView.setImageURI(tempImgUri);
-        Log.d("gwang","here1");
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, tempImgUri);
         startActivityForResult(intent, CAMERA_REQUEST_CODE);
-        Log.d("gwang", "here2");
+
+        Log.d("gwang", "changing photo");
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         imageView = (ImageView)findViewById(R.id.imageProfile);
-        //#5
-        Log.d("gwang", "here3");
+
+        Log.d("gwang", "cropping photo");
         super.onActivityResult(requestCode,resultCode,data);
         if(resultCode != Activity.RESULT_OK) return;
 
-        //#4
+
         if(requestCode == CAMERA_REQUEST_CODE){
-            //#6
+
             File tempImgFile = new File(getExternalFilesDir(null), tempImgFileName);
             saveImgUri = FileProvider.getUriForFile(this,"com.example.myruns1", tempImgFile);
             Crop.of(tempImgUri, saveImgUri).asSquare().start(this);
-            // for the actual assignment change the second tempImgUri so that if the person cancels
-            // it doesn't override it
-            //~~~~ run the code ~~~~
-        }else if(requestCode == Crop.REQUEST_CROP){//#7
+
+        }else if(requestCode == Crop.REQUEST_CROP){
             Uri selectedImgUri = Crop.getOutput(data);
             imageView.setImageURI(null);
             imageView.setImageURI(selectedImgUri);
-            //***
-            //line = tempImgUri.getPath();
-            //textView.setText(line);
-            //***
             location = selectedImgUri;
-            //took_picture = true;
         }
+    }
+
+    public void onFemaleButton(View view){
+        gender = 1;
+    }
+
+    public void onMaleButton(View view){
+        gender = 2;
     }
 
     public void onSaveButton(View view){
@@ -155,11 +145,10 @@ public class MainActivity extends AppCompatActivity {
         onPause();
         Log.d("gwang", "save ");
         finish();
-        //save user data;
     }
 
     public void onCancelButton(View view){
-        Log.d("gwang", "here2");
+        Log.d("gwang", "cancel");
         location = null;
         finish();
     }
@@ -171,27 +160,31 @@ public class MainActivity extends AppCompatActivity {
         editors.putString(NAME_KEY,nameText.getText().toString());
         editors.putString(EMAIL_KEY,emailText.getText().toString());
         editors.putString(PHONE_KEY,phoneText.getText().toString());
-        editors.putInt(CLASS_KEY, Integer.parseInt(classNum.getText().toString()));
+        if(!classNum.getText().toString().equals("")){
+            editors.putInt(CLASS_KEY, Integer.parseInt(classNum.getText().toString()));
+        }
+        else if(classNum.getText().toString().equals("")){
+            editors.putInt(CLASS_KEY, 0);
+        }
+
         editors.putString(MAJOR_KEY,majorText.getText().toString());
-        //editors.putBoolean("TOOK_PICTURE",took_picture);
-        //Log.d("gwang", "name " + nameText.getText().toString());
-        //editors.putString(NAME_KEY, nameText.getText().toString());
-        //saved = sharedPreferences.getBoolean(SAVED_KEY,false);
+        editors.putInt(GENDER_KEY,gender);
+
         editors.apply();
 
-        Toast.makeText(this,"Data saved", Toast.LENGTH_SHORT);
+        Toast.makeText(this,"Data saved", Toast.LENGTH_SHORT).show();
         Log.d("gwang","saved data " + saved);
     }
 
     public void loadData(){
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
         saved = sharedPreferences.getBoolean(SAVED_KEY,false);
-        //took_picture = sharedPreferences.getBoolean("TOOK_PICTURE",false);
         name = sharedPreferences.getString(NAME_KEY,"");
         email = sharedPreferences.getString(EMAIL_KEY,"");
         phone = sharedPreferences.getString(PHONE_KEY,"");
         classYear = sharedPreferences.getInt(CLASS_KEY,0);
         major = sharedPreferences.getString(MAJOR_KEY,"");
+        gender = sharedPreferences.getInt(GENDER_KEY,0);
         Log.d("gwang", "loadData " + sharedPreferences.getBoolean(SAVED_KEY,false));
     }
 
@@ -199,8 +192,21 @@ public class MainActivity extends AppCompatActivity {
         nameText.setText(name);
         emailText.setText(email);
         phoneText.setText(phone);
-        classNum.setText(classYear+"");
+        if(classYear>0){
+            classNum.setText(classYear+"");
+        }
+        else{
+            classNum.setText("");
+        }
+
         majorText.setText(major);
+        if(gender ==1){
+            genderFemale.setChecked(true);
+        }
+        else if(gender == 2 ){
+            genderMale.setChecked(true);
+        }
+        Log.d("gwang", "updatedView");
     }
 
 }

@@ -127,7 +127,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
                     android:layout_weight="1"
-                    android:text="Female" />
+                    android:text="Female"
+                    android:onClick="onFemaleButton"/>
 
                 <RadioButton
                     android:id="@+id/maleButton"
@@ -135,7 +136,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
                     android:layout_weight="1"
-                    android:text="Male" />
+                    android:text="Male"
+                    android:onClick="onMaleButton"/>
             </RadioGroup>
 
         </LinearLayout>
