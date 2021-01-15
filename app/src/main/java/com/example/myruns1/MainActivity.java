@@ -8,6 +8,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +25,9 @@ import android.widget.Toast;
 import com.soundcloud.android.crop.Crop;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
     private EditText nameText;
@@ -55,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
     private Uri saveImgUri;
     private ImageView imageView;
     private String tempImgFileName = "profile.jpg";
+    private boolean took_picture = false;
+    private Uri imgUri;
 
 
     public Uri location;
@@ -79,9 +86,10 @@ public class MainActivity extends AppCompatActivity {
         Log.d("gwang","onCreate " + saved);
 
         if(saved){
-            File tempImgFile = new File(getExternalFilesDir(null), tempImgFileName);//XD: try Environment.DIRECTORY_PICTURES instead of "null"
-            tempImgUri = FileProvider.getUriForFile(this, "com.example.myruns1", tempImgFile);
-            imageView.setImageURI(tempImgUri);
+            //File tempImgFile = new File(getExternalFilesDir(null), tempImgFileName);//XD: try Environment.DIRECTORY_PICTURES instead of "null"
+            //tempImgUri = FileProvider.getUriForFile(this, "com.example.myruns1", tempImgFile);
+            //imageView.setImageURI(saveImgUri);
+            //imgUri=tempImgUri;
 
             updateViews();
 
@@ -121,15 +129,17 @@ public class MainActivity extends AppCompatActivity {
         if(requestCode == CAMERA_REQUEST_CODE){
 
             File tempImgFile = new File(getExternalFilesDir(null), tempImgFileName);
-            saveImgUri = FileProvider.getUriForFile(this,"com.example.myruns1", tempImgFile);
-            Crop.of(tempImgUri, saveImgUri).asSquare().start(this);
+            //saveImgUri = FileProvider.getUriForFile(this,"com.example.myruns1", tempImgFile);
+            Crop.of(tempImgUri, tempImgUri).asSquare().start(this);
 
         }else if(requestCode == Crop.REQUEST_CROP){
             Uri selectedImgUri = Crop.getOutput(data);
             imageView.setImageURI(null);
             imageView.setImageURI(selectedImgUri);
-            location = selectedImgUri;
+            //location = selectedImgUri;
+            //tempImgUri = selectedImgUri;
         }
+        took_picture = true;
     }
 
     public void onFemaleButton(View view){
@@ -141,6 +151,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onSaveButton(View view){
+        //saveImgUri = tempImgUri;
+        imageView.buildDrawingCache();
+        Bitmap map = imageView.getDrawingCache();
+        try {
+            FileOutputStream fos = openFileOutput(tempImgFileName,MODE_PRIVATE);
+            map.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            fos.flush();
+            fos.close();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
         saveData(true);
         onPause();
         Log.d("gwang", "save ");
@@ -149,9 +170,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void onCancelButton(View view){
         Log.d("gwang", "cancel");
-        location = null;
+//        if(took_picture){
+//            File fdelete = new File(tempImgUri.getPath());
+//            fdelete.delete();
+//            tempImgUri = saveImgUri;
+//        }
         finish();
     }
+
+
 
     public void saveData(Boolean save){
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
@@ -160,6 +187,8 @@ public class MainActivity extends AppCompatActivity {
         editors.putString(NAME_KEY,nameText.getText().toString());
         editors.putString(EMAIL_KEY,emailText.getText().toString());
         editors.putString(PHONE_KEY,phoneText.getText().toString());
+        //Log.d("gwang",saveImgUri.toString());
+        //editors.putString("image_key",saveImgUri.toString());
         if(!classNum.getText().toString().equals("")){
             editors.putInt(CLASS_KEY, Integer.parseInt(classNum.getText().toString()));
         }
@@ -185,10 +214,21 @@ public class MainActivity extends AppCompatActivity {
         classYear = sharedPreferences.getInt(CLASS_KEY,0);
         major = sharedPreferences.getString(MAJOR_KEY,"");
         gender = sharedPreferences.getInt(GENDER_KEY,0);
+        //saveImgUri = Uri.parse(sharedPreferences.getString("image_key",""));
         Log.d("gwang", "loadData " + sharedPreferences.getBoolean(SAVED_KEY,false));
     }
 
     public void updateViews(){
+
+        try {
+            FileInputStream fis = openFileInput(tempImgFileName);
+            Bitmap bmap = BitmapFactory.decodeStream(fis);
+            imageView.setImageBitmap(bmap);
+            fis.close();
+        } catch (IOException e) {
+            imageView.setImageResource(R.drawable._200px_dartmouth_college_shield_svg);
+        }
+
         nameText.setText(name);
         emailText.setText(email);
         phoneText.setText(phone);
