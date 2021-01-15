@@ -15,6 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -61,10 +62,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imageView;
     private String tempImgFileName = "profile.jpg";
     private boolean took_picture = false;
-    private Uri imgUri;
 
-
-    public Uri location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,10 +84,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d("gwang","onCreate " + saved);
 
         if(saved){
-            //File tempImgFile = new File(getExternalFilesDir(null), tempImgFileName);//XD: try Environment.DIRECTORY_PICTURES instead of "null"
-            //tempImgUri = FileProvider.getUriForFile(this, "com.example.myruns1", tempImgFile);
-            //imageView.setImageURI(saveImgUri);
-            //imgUri=tempImgUri;
 
             updateViews();
 
@@ -128,16 +122,14 @@ public class MainActivity extends AppCompatActivity {
 
         if(requestCode == CAMERA_REQUEST_CODE){
 
-            File tempImgFile = new File(getExternalFilesDir(null), tempImgFileName);
-            //saveImgUri = FileProvider.getUriForFile(this,"com.example.myruns1", tempImgFile);
-            Crop.of(tempImgUri, tempImgUri).asSquare().start(this);
+            File tempImgFile = new File(getExternalFilesDir(null), "savedImage.jpg");
+            saveImgUri = FileProvider.getUriForFile(this,"com.example.myruns1", tempImgFile);
+            Crop.of(tempImgUri, saveImgUri).asSquare().start(this);
 
         }else if(requestCode == Crop.REQUEST_CROP){
             Uri selectedImgUri = Crop.getOutput(data);
             imageView.setImageURI(null);
             imageView.setImageURI(selectedImgUri);
-            //location = selectedImgUri;
-            //tempImgUri = selectedImgUri;
         }
         took_picture = true;
     }
@@ -151,7 +143,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onSaveButton(View view){
-        //saveImgUri = tempImgUri;
         imageView.buildDrawingCache();
         Bitmap map = imageView.getDrawingCache();
         try {
@@ -170,11 +161,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void onCancelButton(View view){
         Log.d("gwang", "cancel");
-//        if(took_picture){
-//            File fdelete = new File(tempImgUri.getPath());
-//            fdelete.delete();
-//            tempImgUri = saveImgUri;
-//        }
+
         finish();
     }
 
@@ -187,8 +174,6 @@ public class MainActivity extends AppCompatActivity {
         editors.putString(NAME_KEY,nameText.getText().toString());
         editors.putString(EMAIL_KEY,emailText.getText().toString());
         editors.putString(PHONE_KEY,phoneText.getText().toString());
-        //Log.d("gwang",saveImgUri.toString());
-        //editors.putString("image_key",saveImgUri.toString());
         if(!classNum.getText().toString().equals("")){
             editors.putInt(CLASS_KEY, Integer.parseInt(classNum.getText().toString()));
         }
@@ -249,4 +234,9 @@ public class MainActivity extends AppCompatActivity {
         Log.d("gwang", "updatedView");
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.main,menu);
+        return true;
+    }
 }
