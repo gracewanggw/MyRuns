@@ -17,8 +17,10 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private Uri saveImgUri;
     private ImageView imageView;
     private String tempImgFileName = "profile.jpg";
-    private boolean took_picture = false;
+    private String saveImgFileName = "savedImage.jpg";
 
 
     @Override
@@ -109,20 +111,20 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(MediaStore.EXTRA_OUTPUT, tempImgUri);
         startActivityForResult(intent, CAMERA_REQUEST_CODE);
 
-        Log.d("gwang", "changing photo");
+        //Log.d("gwang", "changing photo");
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         imageView = (ImageView)findViewById(R.id.imageProfile);
 
-        Log.d("gwang", "cropping photo");
+        //Log.d("gwang", "cropping photo");
         super.onActivityResult(requestCode,resultCode,data);
         if(resultCode != Activity.RESULT_OK) return;
 
 
         if(requestCode == CAMERA_REQUEST_CODE){
 
-            File tempImgFile = new File(getExternalFilesDir(null), "savedImage.jpg");
+            File tempImgFile = new File(getExternalFilesDir(null), saveImgFileName);
             saveImgUri = FileProvider.getUriForFile(this,"com.example.myruns1", tempImgFile);
             Crop.of(tempImgUri, saveImgUri).asSquare().start(this);
 
@@ -131,7 +133,6 @@ public class MainActivity extends AppCompatActivity {
             imageView.setImageURI(null);
             imageView.setImageURI(selectedImgUri);
         }
-        took_picture = true;
     }
 
     public void onFemaleButton(View view){
@@ -146,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         imageView.buildDrawingCache();
         Bitmap map = imageView.getDrawingCache();
         try {
-            FileOutputStream fos = openFileOutput(tempImgFileName,MODE_PRIVATE);
+            FileOutputStream fos = openFileOutput(saveImgFileName,MODE_PRIVATE);
             map.compress(Bitmap.CompressFormat.PNG, 100, fos);
             fos.flush();
             fos.close();
@@ -155,12 +156,12 @@ public class MainActivity extends AppCompatActivity {
         }
         saveData(true);
         onPause();
-        Log.d("gwang", "save ");
+        //Log.d("gwang", "save ");
         finish();
     }
 
     public void onCancelButton(View view){
-        Log.d("gwang", "cancel");
+        //Log.d("gwang", "cancel");
 
         finish();
     }
@@ -170,6 +171,8 @@ public class MainActivity extends AppCompatActivity {
     public void saveData(Boolean save){
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
         SharedPreferences.Editor editors = sharedPreferences.edit();
+
+        editors.clear();
         editors.putBoolean(SAVED_KEY,save);
         editors.putString(NAME_KEY,nameText.getText().toString());
         editors.putString(EMAIL_KEY,emailText.getText().toString());
@@ -184,10 +187,10 @@ public class MainActivity extends AppCompatActivity {
         editors.putString(MAJOR_KEY,majorText.getText().toString());
         editors.putInt(GENDER_KEY,gender);
 
-        editors.apply();
+        editors.commit();
 
         Toast.makeText(this,"Data saved", Toast.LENGTH_SHORT).show();
-        Log.d("gwang","saved data " + saved);
+        //Log.d("gwang","saved data " + saved);
     }
 
     public void loadData(){
@@ -199,14 +202,14 @@ public class MainActivity extends AppCompatActivity {
         classYear = sharedPreferences.getInt(CLASS_KEY,0);
         major = sharedPreferences.getString(MAJOR_KEY,"");
         gender = sharedPreferences.getInt(GENDER_KEY,0);
-        //saveImgUri = Uri.parse(sharedPreferences.getString("image_key",""));
-        Log.d("gwang", "loadData " + sharedPreferences.getBoolean(SAVED_KEY,false));
+
+        //Log.d("gwang", "loadData " + sharedPreferences.getBoolean(SAVED_KEY,false));
     }
 
     public void updateViews(){
 
         try {
-            FileInputStream fis = openFileInput(tempImgFileName);
+            FileInputStream fis = openFileInput(saveImgFileName);
             Bitmap bmap = BitmapFactory.decodeStream(fis);
             imageView.setImageBitmap(bmap);
             fis.close();
@@ -231,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
         else if(gender == 2 ){
             genderMale.setChecked(true);
         }
-        Log.d("gwang", "updatedView");
+        //Log.d("gwang", "updatedView");
     }
 
     @Override
