@@ -57,13 +57,15 @@ public class MainActivity extends AppCompatActivity {
     public static final String MAJOR_KEY = "major_key";
     public static final String GENDER_KEY = "gender_key";
 
+    public static final String IMG_URI_KEY = "urikey";
+
     public static final int CAMERA_REQUEST_CODE =  1;
-    private boolean saved;
     private Uri tempImgUri;
     private Uri saveImgUri;
     private ImageView imageView;
     private String tempImgFileName = "profile.jpg";
     private String saveImgFileName = "savedImage.jpg";
+
 
 
     @Override
@@ -81,17 +83,32 @@ public class MainActivity extends AppCompatActivity {
         genderFemale = (RadioButton)findViewById(R.id.femaleButton);
         genderMale = (RadioButton)findViewById(R.id.maleButton);
         imageView = (ImageView)findViewById(R.id.imageProfile);
+
+        File tempImgFile = new File(getExternalFilesDir(null), tempImgFileName);
+        File saveImgFile = new File(getExternalFilesDir(null),saveImgFileName);
+        tempImgUri = FileProvider.getUriForFile(this, "com.example.myruns1", tempImgFile);
+        saveImgUri = FileProvider.getUriForFile(this,"com.example.myruns1",saveImgFile);
+
+        Log.d("gwang","onCreate " );
+
         loadData();
+        updateViews();
 
-        Log.d("gwang","onCreate " + saved);
-
-        if(saved){
-
-            updateViews();
-
+        if(savedInstanceState!=null){
+            saveImgUri = Uri.parse(savedInstanceState.getString(IMG_URI_KEY));
+            imageView.setImageURI(saveImgUri);
+            Log.d("gwang", saveImgUri.toString());
         }
 
 
+
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        super.onSaveInstanceState(outState);
+        outState.putString(IMG_URI_KEY,saveImgUri.toString());
+        Log.d("gwang", saveImgUri.toString());
     }
 
     private void checkPermissions()
@@ -111,27 +128,25 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra(MediaStore.EXTRA_OUTPUT, tempImgUri);
         startActivityForResult(intent, CAMERA_REQUEST_CODE);
 
-        //Log.d("gwang", "changing photo");
+        Log.d("gwang", "changing photo");
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         imageView = (ImageView)findViewById(R.id.imageProfile);
 
-        //Log.d("gwang", "cropping photo");
+        Log.d("gwang", "cropping photo");
         super.onActivityResult(requestCode,resultCode,data);
         if(resultCode != Activity.RESULT_OK) return;
 
 
         if(requestCode == CAMERA_REQUEST_CODE){
 
-            File tempImgFile = new File(getExternalFilesDir(null), saveImgFileName);
-            saveImgUri = FileProvider.getUriForFile(this,"com.example.myruns1", tempImgFile);
             Crop.of(tempImgUri, saveImgUri).asSquare().start(this);
 
         }else if(requestCode == Crop.REQUEST_CROP){
-            Uri selectedImgUri = Crop.getOutput(data);
+            saveImgUri = Crop.getOutput(data);
             imageView.setImageURI(null);
-            imageView.setImageURI(selectedImgUri);
+            imageView.setImageURI(saveImgUri);
         }
     }
 
@@ -154,26 +169,25 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
-        saveData(true);
+        saveData();
         onPause();
-        //Log.d("gwang", "save ");
+        Log.d("gwang", "save ");
         finish();
     }
 
     public void onCancelButton(View view){
-        //Log.d("gwang", "cancel");
+        Log.d("gwang", "cancel");
 
         finish();
     }
 
 
 
-    public void saveData(Boolean save){
+    public void saveData(){
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
         SharedPreferences.Editor editors = sharedPreferences.edit();
 
         editors.clear();
-        editors.putBoolean(SAVED_KEY,save);
         editors.putString(NAME_KEY,nameText.getText().toString());
         editors.putString(EMAIL_KEY,emailText.getText().toString());
         editors.putString(PHONE_KEY,phoneText.getText().toString());
@@ -190,12 +204,11 @@ public class MainActivity extends AppCompatActivity {
         editors.commit();
 
         Toast.makeText(this,"Data saved", Toast.LENGTH_SHORT).show();
-        //Log.d("gwang","saved data " + saved);
+        Log.d("gwang","saved data ");
     }
 
     public void loadData(){
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
-        saved = sharedPreferences.getBoolean(SAVED_KEY,false);
         name = sharedPreferences.getString(NAME_KEY,"");
         email = sharedPreferences.getString(EMAIL_KEY,"");
         phone = sharedPreferences.getString(PHONE_KEY,"");
@@ -203,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
         major = sharedPreferences.getString(MAJOR_KEY,"");
         gender = sharedPreferences.getInt(GENDER_KEY,0);
 
-        //Log.d("gwang", "loadData " + sharedPreferences.getBoolean(SAVED_KEY,false));
+        Log.d("gwang", "loadData");
     }
 
     public void updateViews(){
@@ -234,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
         else if(gender == 2 ){
             genderMale.setChecked(true);
         }
-        //Log.d("gwang", "updatedView");
+        Log.d("gwang", "updatedView");
     }
 
     @Override
