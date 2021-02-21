@@ -33,6 +33,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
+    // view items
     private EditText nameText;
     private EditText  emailText;
     private EditText  phoneText;
@@ -41,13 +42,15 @@ public class MainActivity extends AppCompatActivity {
     private EditText classNum;
     private EditText  majorText;
 
+    // user info
     private String name;
     private String email;
     private String phone;
     private int gender;
     private int classYear;
     private String major;
-
+    
+    // key values for shared preferences
     public final static String SHARED_PREFS = "sharedPrefs";
     public static final String SAVED_KEY = "saved_key";
     public static final String NAME_KEY = "name_key";
@@ -56,9 +59,9 @@ public class MainActivity extends AppCompatActivity {
     public static final String CLASS_KEY = "class_key";
     public static final String MAJOR_KEY = "major_key";
     public static final String GENDER_KEY = "gender_key";
-
     public static final String IMG_URI_KEY = "urikey";
 
+    // image and camera
     public static final int CAMERA_REQUEST_CODE =  1;
     private Uri tempImgUri;
     private Uri saveImgUri;
@@ -73,8 +76,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        
+        // checks for user permission to use camera
         checkPermissions();
-
+        
+        // assigning views
         nameText = (EditText)findViewById(R.id.nameEdit);
         emailText = (EditText)findViewById(R.id.emailEdit);
         phoneText = (EditText)findViewById(R.id.phoneEdit);
@@ -83,17 +89,21 @@ public class MainActivity extends AppCompatActivity {
         genderFemale = (RadioButton)findViewById(R.id.femaleButton);
         genderMale = (RadioButton)findViewById(R.id.maleButton);
         imageView = (ImageView)findViewById(R.id.imageProfile);
-
+        
+        //uri set up for photo
         File tempImgFile = new File(getExternalFilesDir(null), tempImgFileName);
         File saveImgFile = new File(getExternalFilesDir(null),saveImgFileName);
         tempImgUri = FileProvider.getUriForFile(this, "com.example.myruns1", tempImgFile);
         saveImgUri = FileProvider.getUriForFile(this,"com.example.myruns1",saveImgFile);
 
         Log.d("gwang","onCreate " );
-
+        
+        // will load and update view with saved data if available, otherwise it will update to default
         loadData();
         updateViews();
 
+        // updates picture from shared instance state
+        // needed if picture is not saved yet and the screen orientation is rotated
         if(savedInstanceState!=null){
             saveImgUri = Uri.parse(savedInstanceState.getString(IMG_URI_KEY));
             imageView.setImageURI(saveImgUri);
@@ -106,11 +116,13 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onSaveInstanceState(Bundle outState){
+        // saves image uri as String if activity ends unexpectedly i.e. screen rotation
         super.onSaveInstanceState(outState);
         outState.putString(IMG_URI_KEY,saveImgUri.toString());
         Log.d("gwang", saveImgUri.toString());
     }
 
+    // check for user permission to use the camera
     private void checkPermissions()
     {
         if(Build.VERSION.SDK_INT < 23)
@@ -120,17 +132,21 @@ public class MainActivity extends AppCompatActivity {
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 0);
         }
     }
-
+    
+    // Called when the "CHANGE" button is clicked
     public void onChangeButton(View view){
         File tempImgFile = new File(getExternalFilesDir(null), tempImgFileName);
         tempImgUri = FileProvider.getUriForFile(this, "com.example.myruns1", tempImgFile);
+        
+        //starting built in camera activity on phone
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, tempImgUri);
-        startActivityForResult(intent, CAMERA_REQUEST_CODE);
+        startActivityForResult(intent, CAMERA_REQUEST_CODE); 
 
         Log.d("gwang", "changing photo");
     }
-
+    
+    // Called once picutre is taken in camera acitivty to allow crop
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         imageView = (ImageView)findViewById(R.id.imageProfile);
 
@@ -143,13 +159,15 @@ public class MainActivity extends AppCompatActivity {
 
             Crop.of(tempImgUri, saveImgUri).asSquare().start(this);
 
-        }else if(requestCode == Crop.REQUEST_CROP){
+        }
+        else if(requestCode == Crop.REQUEST_CROP){
             saveImgUri = Crop.getOutput(data);
             imageView.setImageURI(null);
             imageView.setImageURI(saveImgUri);
         }
     }
-
+    
+    //sets gender int
     public void onFemaleButton(View view){
         gender = 1;
     }
@@ -158,7 +176,9 @@ public class MainActivity extends AppCompatActivity {
         gender = 2;
     }
 
+    // called when "SAVE" is pressed
     public void onSaveButton(View view){
+        // saving profile image
         imageView.buildDrawingCache();
         Bitmap map = imageView.getDrawingCache();
         try {
@@ -169,20 +189,21 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
-        saveData();
-        onPause();
+       
+        saveData(); // saving all other data
+        onPause(); //provides buffer time for data to save
         Log.d("gwang", "save ");
-        finish();
+        finish(); // ends activity and closes app
     }
 
     public void onCancelButton(View view){
         Log.d("gwang", "cancel");
 
-        finish();
+        finish(); //ends activity and closes app
     }
 
 
-
+    // saves all data in to shared preferences
     public void saveData(){
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
         SharedPreferences.Editor editors = sharedPreferences.edit();
@@ -207,6 +228,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("gwang","saved data ");
     }
 
+    // loads data from shared preferences into class variables
     public void loadData(){
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
         name = sharedPreferences.getString(NAME_KEY,"");
@@ -219,6 +241,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("gwang", "loadData");
     }
 
+    // updates the ui to show data that has been saved
     public void updateViews(){
 
         try {
